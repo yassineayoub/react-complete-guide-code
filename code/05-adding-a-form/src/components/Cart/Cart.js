@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useReducer } from 'react'
 import Modal from '../UI/Modal';
 import classes from './Cart.module.css';
 
 const Cart = (props) => {
+    
     const cartItems = <ul className={classes['cart-items']}>{[{id: "c1", name: "sushi", price: 22.14}].map((item) => <li key={item.id}>{item.name}</li>)}</ul>
   return (
     <Modal onClose={props.onClose}>
