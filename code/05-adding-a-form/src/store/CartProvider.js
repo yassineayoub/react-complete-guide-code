@@ -9,10 +9,35 @@ const defaultCartState = {
 // On défini ici le Reducer , en dehors de la function CartProvider car elle n'a pas besoin d'etre exectuée a chaque changement d'état de CartProvider
 const cartReducer = (state,action) => {
     if (action.type === 'ADD') {
-        // concat renvoi une nouvelle array comparé a push 
-        const updatedItems = state.items.concat(action.item)
         //on ajoute au totalAmount le prix de l'item x la quantitée
         const updatedTotalAmount = state.totalAmount + action.item.price * action.item.amount;
+        //On veut que si on ajoute un item dans le cart , s'il existe on ajoute 1 au amount au lieu d'ajouter une nouvelle ligne
+        //findIndex va retourner l'index de l'item s'il existe dans l'array
+        const existingCartItemIndex = state.items.findIndex(item => item.id === action.item.id)
+
+        const existingCartItem = state.items[existingCartItemIndex];
+        let updatedItems;
+        
+        // Si l'item existe dans state.items 
+        if (existingCartItem) {
+            let updatedItem;
+            //on créer un objet updatedItem
+            updatedItem = {
+            //on le rempli avec ses ancienne valeurs
+            ...existingCartItem,
+            //on set l'amount = l'ancienne valeur + la quantitée entrée dans le form
+            amount: existingCartItem.amount + action.item.amount
+            }
+
+            updatedItems = [...state.items];
+            //On écrase l'ancien item avec le nouveau
+            updatedItems[existingCartItemIndex] = updatedItem;
+        } else {
+            // concat renvoi une nouvelle array comparé a push 
+            //Si l'item n'existe pas déja, on l'ajoute directement
+            updatedItems = state.items.concat(action.item)
+        }
+   
         return {
             items: updatedItems,
             totalAmount: updatedTotalAmount,
@@ -31,7 +56,7 @@ const CartProvider = (props) => {
 
     //fonction qui va ajouter un item dans le cartContext
     const addItemToCartHandler = item => {
-        //La convention de nommage et de mettre en majuscule le type ( ou identifier , le nom est au choix)
+        //La convention de nommage et de mettre en majuscule le type ( ou identifier , le nom est au choix )
         dispatchCartAction({type: 'ADD', item: item});
     };
     //handler qui va suppr un item
