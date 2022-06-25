@@ -43,6 +43,31 @@ const cartReducer = (state,action) => {
             totalAmount: updatedTotalAmount,
         }
     }
+    if (action.type === "REMOVE") {
+        const existingCartItemIndex = state.items.findIndex((item) => item.id === action.id );
+        const existingItem = state.items[existingCartItemIndex];
+        let updatedItems;
+
+        if (existingItem.amount === 1) {
+            //si en cliquand , l'amount === 1 alors on retourne une array où l'id en parametre de l'action n'est pas présent
+            updatedItems = state.items.filter((item) => item.id !== action.id)
+        } else {
+            // on créer un nouvel item avec le spread opérator , on reprend tte les valeurs de l'objet 
+            //En recréant l'objet on redéfini une de ses propriétée, ici on décrémente l'amount
+            const updatedItem = {...existingItem, amount: existingItem.amount - 1};
+            //on créer une nouvelle array sur la base de l'ancienne et on l'overwrite en réinjectant l'item updated
+            updatedItems = [...state.items];
+            updatedItems[existingCartItemIndex] = updatedItem;
+        }
+        let updatedTotalAmount = state.totalAmount - existingItem.price;
+
+        return {
+            items: updatedItems,
+            totalAmount: updatedTotalAmount,
+        }
+        // console.log(cartItemIndex);
+        // console.log(state.items)
+    }
     return defaultCartState
 }
 /****
